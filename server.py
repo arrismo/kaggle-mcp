@@ -32,57 +32,6 @@ class MCPResponse(BaseModel):
     message: MessageContent
     usage: Optional[Dict[str, Any]] = None
 
-# Helper functions
-def process_dataset_request(dataset_name, context):
-    """Process a request for Kaggle dataset information"""
-    try:
-        # Extract dataset owner and name
-        if "/" not in dataset_name:
-            raise ValueError("Dataset name should be in format 'owner/dataset-name'")
-        
-        # Get dataset information
-        dataset_info = api.dataset_view(dataset_name)
-        
-        # Check if sample data is requested
-        sample_data = None
-        if context.get("include_sample", False):
-            with tempfile.TemporaryDirectory() as tmp_dir:
-                api.dataset_download_files(dataset_name, path=tmp_dir, unzip=True)
-                # Find CSV files
-                csv_files = [f for f in os.listdir(tmp_dir) if f.endswith('.csv')]
-                if csv_files:
-                    # Read the first CSV file
-                    df = pd.read_csv(os.path.join(tmp_dir, csv_files[0]))
-                    sample_data = df.head(5).to_dict(orient="records")
-        
-        return {
-            "title": dataset_info.title,
-            "size": dataset_info.size,
-            "lastUpdated": str(dataset_info.lastUpdated),
-            "totalBytes": dataset_info.totalBytes,
-            "downloadCount": dataset_info.downloadCount,
-            "files": [{"name": f.name, "size": f.size} for f in dataset_info.files],
-            "sample_data": sample_data
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing dataset: {str(e)}")
-
-def process_competition_request(competition_name, context):
-    """Process a request for Kaggle competition information"""
-    try:
-        # Get competition information
-        competition_info = api.competition_view(competition_name)
-        
-        return {
-            "title": competition_info.title,
-            "description": competition_info.description,
-            "deadline": str(competition_info.deadline),
-            "category": competition_info.category,
-            "reward": competition_info.reward,
-            "teamCount": competition_info.teamCount
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing competition: {str(e)}")
 
 def process_search_request(query, context):
     """Process a search request for Kaggle datasets"""
@@ -96,7 +45,10 @@ def process_search_request(query, context):
                 {
                     "ref": ds.ref,
                     "title": ds.title,
-                    "size": ds.totalBytes if hasattr(ds, 'totalBytes') else "N/A"
+                    "subtitle": ds.subtitle,
+                    "download_count": ds.download_count,
+                    "last_updated": ds.last_updated,
+                    "usability_rating": ds.usability_rating
                 }
                 for ds in search_results[:10]  # Limit to 10 results
             ]
@@ -123,19 +75,8 @@ async def chat_completions(request: MCPRequest = Body(...)):
     # Process based on intent
     response_content = {}
     
-    if "dataset" in user_content and context.get("dataset_name"):
-        # Handle dataset requests
-        dataset_name = context["dataset_name"]
-        response_content = process_dataset_request(dataset_name, context)
-        message = f"Here's information about the dataset '{dataset_name}'."
     
-    elif "competition" in user_content and context.get("competition_name"):
-        # Handle competition requests
-        competition_name = context["competition_name"]
-        response_content = process_competition_request(competition_name, context)
-        message = f"Here's information about the competition '{competition_name}'."
-    
-    elif "search" in user_content and context.get("query"):
+    if "search" in user_content and context.get("query"):
         # Handle search requests
         query = context["query"]
         response_content = process_search_request(query, context)

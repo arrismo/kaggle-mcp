@@ -43,35 +43,6 @@ def main():
             "usability_rating": search_results[0].usability_rating
         }, indent=2, default=json_serializer))
     
-    # Example 2: Get dataset info
-    print("\n=== Example 2: Dataset Info ===")
-    try:
-        dataset_info = api.dataset_view("rohanrao/formula-1-world-championship-1950-2020")
-        print_object_structure(dataset_info, "Dataset Info")
-        print("\nDataset details:")
-        print(json.dumps({
-            "title": dataset_info.title,
-            "files": [{"name": f.name, "size": f.size} for f in dataset_info.files]
-        }, indent=2, default=json_serializer))
-    except Exception as e:
-        print(f"Error getting dataset info: {e}")
-    
-    # Example 3: Get competition info
-    print("\n=== Example 3: Competition Info ===")
-    try:
-        competition_info = api.competition_view("titanic")
-        print_object_structure(competition_info, "Competition Info")
-        print("\nCompetition details:")
-        print(json.dumps({
-            "title": competition_info.title,
-            "description": competition_info.description,
-            "deadline": str(competition_info.deadline),
-            "category": competition_info.category,
-            "reward": competition_info.reward,
-            "teamCount": competition_info.teamCount
-        }, indent=2, default=json_serializer))
-    except Exception as e:
-        print(f"Error getting competition info: {e}")
 
 if __name__ == "__main__":
     main() 
