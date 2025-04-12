@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 import mcp.types as types
 
-# Load environment variables if .env file exists
 load_dotenv()
 
 # Initialize Kaggle API
@@ -16,7 +15,6 @@ try:
     print("Kaggle API Authenticated Successfully.")
 except Exception as e:
     print(f"Error authenticating Kaggle API: {e}")
-    # Decide how to handle this - maybe exit or run with limited functionality
     api = None
 
 
