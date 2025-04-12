@@ -23,43 +23,6 @@ except Exception as e:
 # Initialize the FastMCP server
 mcp = FastMCP("kaggle-mcp")
 
-# --- Define Resources ---
-@mcp.resource("kaggle://competitions/{competition_id}")
-async def get_competition_details(competition_id: str) -> str:
-    """Provides details about a specific Kaggle competition using the Kaggle API."""
-    if not api:
-        raise ConnectionError("Kaggle API not authenticated.")
-
-    print(f"Fetching details for competition: {competition_id}")
-    try:
-        competitions = api.competition_list(search=competition_id)
-        found_comp = None
-        for comp in competitions:
-            if str(getattr(comp, 'id', '')) == competition_id or getattr(comp, 'ref', '') == competition_id:
-                found_comp = comp
-                break
-
-        if found_comp:
-            # Format the available basic info
-            details = {
-                "id": getattr(found_comp, 'id', 'N/A'),
-                "ref": getattr(found_comp, 'ref', 'N/A'),
-                "title": getattr(found_comp, 'title', 'N/A'),
-                "category": getattr(found_comp, 'category', 'N/A'),
-                "organizationName": getattr(found_comp, 'organizationName', 'N/A'),
-                "evaluationMetric": getattr(found_comp, 'evaluationMetric', 'N/A'),
-                "reward": getattr(found_comp, 'reward', 'N/A'),
-                "userHasEntered": getattr(found_comp, 'userHasEntered', 'N/A'),
-                "deadline": str(getattr(found_comp, 'deadline', 'N/A')),
-            }
-            return json.dumps(details, indent=2)
-        else:
-            raise ValueError(f"Competition '{competition_id}' not found via search.")
-    except Exception as e:
-        # Log the error potentially
-        print(f"Error fetching competition details for {competition_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Error fetching competition details: {str(e)}")
-
 
 # --- Define Tools ---
 @mcp.tool()
@@ -135,7 +98,7 @@ async def download_kaggle_dataset(dataset_ref: str, download_path: str | None = 
     except Exception as e:
         # Log the error potentially
         print(f"Error downloading dataset '{dataset_ref}': {e}")
-        # Check for common errors like 404 Not Found
+        # Check for 404 Not Found
         if "404" in str(e):
             return f"Error: Dataset '{dataset_ref}' not found or access denied."
         return f"Error downloading dataset '{dataset_ref}': {str(e)}"
@@ -145,7 +108,6 @@ async def download_kaggle_dataset(dataset_ref: str, download_path: str | None = 
 @mcp.prompt()
 async def generate_eda_notebook(dataset_ref: str) -> types.GetPromptResult:
     """Generates a basic EDA prompt for a given Kaggle dataset reference."""
-    # Example: dataset_ref could be 'kaggle/input/titanic'
     print(f"Generating EDA prompt for dataset: {dataset_ref}")
     prompt_text = f"Generate Python code for basic Exploratory Data Analysis (EDA) for the Kaggle dataset '{dataset_ref}'. Include loading the data, checking for missing values, visualizing key features, and basic statistics."
     return types.GetPromptResult(
