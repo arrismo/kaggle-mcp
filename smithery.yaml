@@ -1,0 +1,38 @@
+# smithery.yaml
+startCommand:
+  type: stdio
+  # Defines the configuration options users can set on Smithery.ai
+  configSchema:
+    type: object
+    properties:
+      kaggleUsername:
+        type: string
+        title: Kaggle Username
+        description: Your Kaggle account username.
+      kaggleKey:
+        type: string
+        title: Kaggle API Key
+        description: Your Kaggle API key (obtain from Kaggle Account > API).
+        format: password # Use 'password' format for sensitive fields in UI
+    required:
+      - kaggleUsername
+      - kaggleKey
+  # JavaScript function that returns the command to start the server.
+  # 'config' parameter contains the values provided by the user based on configSchema.
+  commandFunction: |
+    function(config) {
+      return {
+        command: "python", // The command to execute
+        args: ["src/server.py"], // Arguments for the command
+        env: {
+          // Pass configuration as environment variables to the server process
+          KAGGLE_USERNAME: config.kaggleUsername,
+          KAGGLE_KEY: config.kaggleKey
+        }
+      };
+    }
+
+# Optional build configuration (if Dockerfile is not in root or needs specific context)
+# build:
+#   dockerfile: Dockerfile # Default is Dockerfile in the same dir as smithery.yaml
+#   dockerBuildPath: .    # Default is the directory containing smithery.yaml 
