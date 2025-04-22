@@ -1,4 +1,5 @@
 [![smithery badge](https://smithery.ai/badge/@arrismo/kaggle-mcp)](https://smithery.ai/server/@arrismo/kaggle-mcp)
+<a href="https://glama.ai/mcp/servers/arwswog1el"><img width="380" height="200" src="https://glama.ai/mcp/servers/arwswog1el/badge" alt="Kaggle MCP Server" /></a>
 
 # Kaggle MCP (Model Context Protocol) Server
 This repository contains an MCP (Model Context Protocol) server (`server.py`) built using the `fastmcp` library. It interacts with the Kaggle API to provide tools for searching and downloading datasets, and a prompt for generating EDA notebooks.
