@@ -18,6 +18,13 @@ COPY src/ ./src/
 # --no-cache avoids caching downloads within the layer
 RUN uv sync --no-cache
 
+# Install any additional dependencies from requirements.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy .env file if present (for local development, to provide Kaggle credentials)
+COPY .env ./
+
 # Command to run the server (Smithery will likely use the command from smithery.yaml)
 # Ensure the server listens on STDIO as expected by MCP
-CMD ["python", "src/server.py"] 
+CMD ["python", "src/server.py"]

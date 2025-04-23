@@ -58,6 +58,37 @@ This repository contains an MCP (Model Context Protocol) server (`server.py`) bu
     ```
     The server will start and register its resources, tools, and prompts. You can interact with it using an MCP client or compatible tools.
 
+## Running the Docker Container
+
+### 1. Set up Kaggle API credentials
+
+This project requires Kaggle API credentials to access Kaggle datasets.
+
+- Go to https://www.kaggle.com/settings and click "Create New API Token" to download your `kaggle.json` file.
+- Open the `kaggle.json` file and copy your username and key into a new `.env` file in the project root:
+
+```
+KAGGLE_USERNAME=your_username
+KAGGLE_KEY=your_key
+```
+
+### 2. Build the Docker image
+
+```sh
+docker build -t kaggle-mcp-test .
+```
+
+### 3. Run the Docker container using your .env file
+
+```sh
+docker run --rm -it --env-file .env kaggle-mcp-test
+```
+
+This will automatically load your Kaggle credentials as environment variables inside the container.
+
+---
+
+
 ## Server Features
 
 The server exposes the following capabilities through the Model Context Protocol:
