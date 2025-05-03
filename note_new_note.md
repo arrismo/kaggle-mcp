@@ -1,3 +1,2 @@
-# New Note
-
+# Testing if it works
 Start writing here...
