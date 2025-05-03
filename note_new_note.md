@@ -1,3 +1,0 @@
-# New Note
-
-Start writing here...
