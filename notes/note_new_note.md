@@ -1,3 +1,2 @@
-# New Notes
 
 Start writing here...
