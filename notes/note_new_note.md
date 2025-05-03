@@ -1,4 +1,3 @@
-# Sample
-
+# New Notes
 
 Start writing here...
