@@ -1,4 +1,3 @@
-# Testing NOtes
-
+# New Note
 
 Start writing here...
