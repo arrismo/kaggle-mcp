@@ -1,3 +1,3 @@
-# Test Note
+# New Note
 
 Start writing here...
