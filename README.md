@@ -50,6 +50,10 @@ This repository contains an MCP (Model Context Protocol) server (`server.py`) bu
         -   Download your `kaggle.json` file from your Kaggle account.
         -   Place the `kaggle.json` file in the expected location (usually `~/.kaggle/kaggle.json` on Linux/macOS or `C:\Users\<Your User Name>\.kaggle\kaggle.json` on Windows). The `kaggle` library will automatically detect this file if the environment variables are not set.
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/arrismo-kaggle-mcp).
+
 ## Running the Server
 
 1.  **Ensure your virtual environment is active.**
