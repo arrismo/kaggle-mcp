@@ -1,3 +1,4 @@
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/arrismo/kaggle-mcp)](https://archestra.ai/mcp-catalog/arrismo__kaggle-mcp)
 [![smithery badge](https://smithery.ai/badge/@arrismo/kaggle-mcp)](https://smithery.ai/server/@arrismo/kaggle-mcp)
 <a href="https://glama.ai/mcp/servers/arwswog1el"><img width="380" height="200" src="https://glama.ai/mcp/servers/arwswog1el/badge" alt="Kaggle MCP Server" /></a>
 
