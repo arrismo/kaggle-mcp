@@ -1,138 +1,196 @@
 [![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/arrismo/kaggle-mcp)](https://archestra.ai/mcp-catalog/arrismo__kaggle-mcp)
-[![smithery badge](https://smithery.ai/badge/@arrismo/kaggle-mcp)](https://smithery.ai/server/@arrismo/kaggle-mcp)
 <a href="https://glama.ai/mcp/servers/arwswog1el"><img width="380" height="200" src="https://glama.ai/mcp/servers/arwswog1el/badge" alt="Kaggle MCP Server" /></a>
 
-# Kaggle MCP (Model Context Protocol) Server
-This repository contains an MCP (Model Context Protocol) server (`server.py`) built using the `fastmcp` library. It interacts with the Kaggle API to provide tools for searching and downloading datasets, and a prompt for generating EDA notebooks.
+# Kaggle MCP Server
 
-## Project Structure
+A Model Context Protocol (MCP) server that exposes Kaggle dataset search, download, and EDA prompt generation to MCP clients such as Claude Desktop.
 
--   `server.py`: The FastMCP server application. It defines resources, tools, and prompts for interacting with Kaggle.
--   `.env.example`: An example file for environment variables (Kaggle API credentials). Rename to `.env` and fill in your details.
--   `requirements.txt`: Lists the necessary Python packages.
--   `pyproject.toml` & `uv.lock`: Project metadata and locked dependencies for `uv` package manager.
--   `datasets/`: Default directory where downloaded Kaggle datasets will be stored.
+## Features
 
-## Setup
+- Search Kaggle datasets by keyword.
+- Download and unzip Kaggle datasets locally.
+- Generate a starter Exploratory Data Analysis (EDA) prompt for a Kaggle dataset.
+- Supports Kaggle credentials via environment variables or the standard `kaggle.json` file.
+- Runs locally, in Docker, or through Smithery.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
+## Available MCP Capabilities
 
-2.  **Create a virtual environment (recommended):**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    # Or use uv: uv venv
-    ```
-
-3.  **Install dependencies:**
-    Using pip:
-    ```bash
-    pip install -r requirements.txt
-    ```
-    Or using uv:
-    ```bash
-    uv sync
-    ```
-
-4.  **Set up Kaggle API credentials:**
-    -   **Method 1 (Recommended): Environment Variables**
-        -   Create `.env` file
-        -   Open the `.env` file and add your Kaggle username and API key:
-            ```dotenv
-            KAGGLE_USERNAME=your_kaggle_username
-            KAGGLE_KEY=your_kaggle_api_key
-            ```
-        -   You can obtain your API key from your Kaggle account page (`Account` > `API` > `Create New API Token`). This will download a `kaggle.json` file containing your username and key.
-    -   **Method 2: `kaggle.json` file**
-        -   Download your `kaggle.json` file from your Kaggle account.
-        -   Place the `kaggle.json` file in the expected location (usually `~/.kaggle/kaggle.json` on Linux/macOS or `C:\Users\<Your User Name>\.kaggle\kaggle.json` on Windows). The `kaggle` library will automatically detect this file if the environment variables are not set.
-
-## Running the Server
-
-1.  **Ensure your virtual environment is active.**
-2.  **Run the MCP server:**
-    ```bash
-    uv run kaggle-mcp
-    ```
-    The server will start and register its resources, tools, and prompts. You can interact with it using an MCP client or compatible tools.
-
-## Running the Docker Container
-
-### 1. Set up Kaggle API credentials
-
-This project requires Kaggle API credentials to access Kaggle datasets.
-
-- Go to https://www.kaggle.com/settings and click "Create New API Token" to download your `kaggle.json` file.
-- Open the `kaggle.json` file and copy your username and key into a new `.env` file in the project root:
-
-```
-KAGGLE_USERNAME=your_username
-KAGGLE_KEY=your_key
-```
-
-### 2. Build the Docker image
-
-```sh
-docker build -t kaggle-mcp-test .
-```
-
-### 3. Run the Docker container using your .env file
-
-```sh
-docker run --rm -it --env-file .env kaggle-mcp-test
-```
-
-This will automatically load your Kaggle credentials as environment variables inside the container.
-
----
-
-
-## Server Features
-
-The server exposes the following capabilities through the Model Context Protocol:
 ### Tools
 
-*   **`search_kaggle_datasets(query: str)`**:
-    *   Searches for datasets on Kaggle matching the provided query string.
-    *   Returns a JSON list of the top 10 matching datasets with details like reference, title, download count, and last updated date.
-*   **`download_kaggle_dataset(dataset_ref: str, download_path: str | None = None)`**:
-    *   Downloads and unzips files for a specific Kaggle dataset.
-    *   `dataset_ref`: The dataset identifier in the format `username/dataset-slug` (e.g., `kaggle/titanic`).
-    *   `download_path` (Optional): Specifies where to download the dataset. If omitted, it defaults to `./datasets/<dataset_slug>/` relative to the server script's location.
+#### `search_kaggle_datasets(query: str)`
+
+Searches Kaggle for datasets matching `query` and returns up to 10 results as JSON.
+
+Returned fields include:
+
+- `ref`
+- `title`
+- `subtitle`
+- `download_count`
+- `last_updated`
+- `usability_rating`
+
+#### `download_kaggle_dataset(dataset_ref: str, download_path: str | None = None)`
+
+Downloads and unzips a Kaggle dataset.
+
+- `dataset_ref`: Kaggle dataset reference in `owner/dataset-slug` format, for example `kaggle/titanic`.
+- `download_path`: Optional local output path. If omitted, files are saved to `./datasets/<dataset_slug>/`.
 
 ### Prompts
 
-*   **`generate_eda_notebook(dataset_ref: str)`**:
-    *   Generates a prompt message suitable for an AI model (like Gemini) to create a basic Exploratory Data Analysis (EDA) notebook for the specified Kaggle dataset reference.
-    *   The prompt asks for Python code covering data loading, missing value checks, visualizations, and basic statistics.
+#### `generate_eda_notebook(dataset_ref: str)`
 
-## Connecting to Claude Desktop 
-Go to Claude > Settings > Developer > Edit Config > claude_desktop_config.json to include the following:
+Creates a prompt for generating basic Python EDA code for the provided Kaggle dataset reference. The prompt asks for data loading, missing-value checks, visualizations, and summary statistics.
 
+## Requirements
+
+- Python 3.10+
+- Kaggle account and API token
+- An MCP-compatible client
+
+## Kaggle Credentials
+
+Create a Kaggle API token from your Kaggle account settings:
+
+1. Go to <https://www.kaggle.com/settings>.
+2. Select **Create New API Token**.
+3. Download `kaggle.json`.
+
+Use either environment variables or the standard Kaggle config file.
+
+### Option 1: Environment variables
+
+Create a `.env` file in the project root:
+
+```dotenv
+KAGGLE_USERNAME=your_kaggle_username
+KAGGLE_KEY=your_kaggle_api_key
 ```
+
+### Option 2: `kaggle.json`
+
+Place `kaggle.json` in the standard Kaggle location:
+
+- macOS/Linux: `~/.kaggle/kaggle.json`
+- Windows: `C:\Users\<Your User Name>\.kaggle\kaggle.json`
+
+On macOS/Linux, make sure the file is not world-readable:
+
+```bash
+chmod 600 ~/.kaggle/kaggle.json
+```
+
+## Installation
+
+```bash
+git clone <repository-url>
+cd kaggle-mcp
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+```
+
+Install dependencies with one of the following methods.
+
+### Using uv
+
+```bash
+uv sync
+```
+
+### Using pip
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running Locally
+
+With `uv`:
+
+```bash
+uv run kaggle-mcp
+```
+
+Or run the server module directly:
+
+```bash
+python src/server.py
+```
+
+The server communicates over MCP stdio and is intended to be launched by an MCP client.
+
+## Claude Desktop Configuration
+
+Open Claude Desktop settings, then go to **Developer** > **Edit Config** and add this server to `claude_desktop_config.json`.
+
+If installed in the project environment:
+
+```json
 {
   "mcpServers": {
     "kaggle-mcp": {
-      "command": "kaggle-mcp",
-      "cwd": "<path-to-their-cloned-repo>/kaggle-mcp"
+      "command": "uv",
+      "args": ["run", "kaggle-mcp"],
+      "cwd": "/absolute/path/to/kaggle-mcp",
+      "env": {
+        "KAGGLE_USERNAME": "your_kaggle_username",
+        "KAGGLE_KEY": "your_kaggle_api_key"
+      }
     }
   }
 }
 ```
 
-## Usage Example
+If using `kaggle.json`, you can omit the `env` block.
 
-An AI agent or MCP client could interact with this server like this:
+## Docker
 
-1.  **Agent:** "Search Kaggle for datasets about 'heart disease'"
-    *   *Server executes `search_kaggle_datasets(query='heart disease')`*
-2.  **Agent:** "Download the dataset 'user/heart-disease-dataset'"
-    *   *Server executes `download_kaggle_dataset(dataset_ref='user/heart-disease-dataset')`*
-3.  **Agent:** "Generate an EDA notebook prompt for 'user/heart-disease-dataset'"
-    *   *Server executes `generate_eda_notebook(dataset_ref='user/heart-disease-dataset')`*
-    *   *Server returns a structured prompt message.*
-4.  **Agent:** (Sends the prompt to a code-generating model) -> Receives EDA Python code.
+Build the image:
+
+```bash
+docker build -t kaggle-mcp .
+```
+
+Run with credentials from `.env`:
+
+```bash
+docker run --rm -i --env-file .env kaggle-mcp
+```
+
+## Smithery
+
+This repository includes `smithery.yaml`. Smithery starts the server over stdio and passes these configuration values as environment variables:
+
+- `kaggleUsername` -> `KAGGLE_USERNAME`
+- `kaggleKey` -> `KAGGLE_KEY`
+
+## Example Workflow
+
+1. Ask your MCP client: "Search Kaggle for heart disease datasets."
+2. The client calls `search_kaggle_datasets`.
+3. Choose a dataset reference from the results, for example `user/heart-disease-dataset`.
+4. Ask: "Download `user/heart-disease-dataset`."
+5. Ask: "Generate an EDA notebook prompt for `user/heart-disease-dataset`."
+
+## Project Structure
+
+```text
+.
+├── Dockerfile
+├── README.md
+├── pyproject.toml
+├── requirements.txt
+├── smithery.yaml
+├── src/
+│   ├── __init__.py
+│   └── server.py
+└── uv.lock
+```
+
+Downloaded datasets are saved under `datasets/` by default. This directory is created at runtime when downloads are requested.
